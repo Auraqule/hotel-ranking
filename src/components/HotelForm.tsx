@@ -91,7 +91,7 @@ const HotelForm: React.FC<HotelFormProps> = ({ hotel, onSubmit }) => {
                   render={({ field }) => (
                     <Select
                       onValueChange={field.onChange}
-                      defaultValue={field?.value!}
+                      defaultValue={field?.value as string}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select a chain" />
@@ -159,21 +159,34 @@ const HotelForm: React.FC<HotelFormProps> = ({ hotel, onSubmit }) => {
               <Controller
                 name="latitude"
                 control={control}
-                render={({ field }) => (
-                  <MapPicker
-                    latitude={field.value}
-                    longitude={control._fields.longitude?.value}
-                    location={location}
-                    onLocationChange={(lat, lng, address, city, country) => {
-                      field.onChange(lat);
-                      setValue("longitude", lng);
-                      setValue("address", address);
-                      setValue("city", city);
-                      setValue("country", country);
-                    }}
+                render={({ field: latitudeField }) => (
+                  <Controller
+                    name="longitude"
+                    control={control}
+                    render={({ field: longitudeField }) => (
+                      <MapPicker
+                        latitude={latitudeField.value}
+                        longitude={longitudeField.value}
+                        location={location}
+                        onLocationChange={(
+                          lat,
+                          lng,
+                          address,
+                          city,
+                          country
+                        ) => {
+                          latitudeField.onChange(lat);
+                          longitudeField.onChange(lng);
+                          setValue("address", address);
+                          setValue("city", city);
+                          setValue("country", country);
+                        }}
+                      />
+                    )}
                   />
                 )}
               />
+
               {errors.latitude && (
                 <p className="text-sm text-red-600">
                   {errors.latitude.message}
